@@ -1,4 +1,4 @@
-﻿
+﻿#if !DISABLE_SYS_PROXY
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -7,6 +7,7 @@ using System.Threading;
 using v2rayN.Mode;
 using v2rayN.Properties;
 using v2rayN.Tool;
+#endif
 
 namespace v2rayN.HttpProxyHandler
 {
@@ -14,16 +15,19 @@ namespace v2rayN.HttpProxyHandler
     {
         //private const string _userWininetConfigFile = "user-wininet.json";
 
-        //private static string _queryStr;
+//private static string _queryStr;
 
-        // In general, this won't change
-        // format:
-        //  <flags><CR-LF>
-        //  <proxy-server><CR-LF>
-        //  <bypass-list><CR-LF>
-        //  <pac-url>
+// In general, this won't change
+// format:
+//  <flags><CR-LF>
+//  <proxy-server><CR-LF>
+//  <bypass-list><CR-LF>
+//  <pac-url>
+#if !DISABLE_SYS_PROXY
         private static SysproxyConfig _userSettings = null;
+#endif
 
+#if !DISABLE_SYS_PROXY
         enum RET_ERRORS : int
         {
             RET_NO_ERROR = 0,
@@ -33,22 +37,26 @@ namespace v2rayN.HttpProxyHandler
             NO_MEMORY = 4,
             INVAILD_OPTION_COUNT = 5,
         };
+#endif
 
         static SysProxyHandle()
         {
-            try
-            {
-                FileManager.UncompressFile(Utils.GetTempPath("sysproxy.exe"),
-                    Environment.Is64BitOperatingSystem ? Resources.sysproxy64_exe : Resources.sysproxy_exe);
-            }
-            catch (IOException ex)
-            {
-                Utils.SaveLog(ex.Message, ex);
-            }
+#if !DISABLE_SYS_PROXY
+                try
+                {
+                    FileManager.UncompressFile(Utils.GetTempPath("sysproxy.exe"),
+                        Environment.Is64BitOperatingSystem ? Resources.sysproxy64_exe : Resources.sysproxy_exe);
+                }
+                catch (IOException ex)
+                {
+                    Utils.SaveLog(ex.Message, ex);
+                }
+#endif
         }
 
         public static void SetIEProxy(bool enable, bool global, string strProxy)
         {
+#if !DISABLE_SYS_PROXY
             //Read();
 
             //if (!_userSettings.UserSettingsRecorded)
@@ -80,11 +88,13 @@ namespace v2rayN.HttpProxyHandler
 
             //Save();
             ExecSysproxy(arguments);
+#endif
         }
 
         // set system proxy to 1 (null) (null) (null)
         public static bool ResetIEProxy()
         {
+#if !DISABLE_SYS_PROXY
             try
             {
                 // clear user-wininet.json
@@ -97,12 +107,13 @@ namespace v2rayN.HttpProxyHandler
             {
                 return false;
             }
-
+#endif
             return true;
         }
 
         private static void ExecSysproxy(string arguments)
         {
+#if !DISABLE_SYS_PROXY
             // using event to avoid hanging when redirect standard output/error
             // ref: https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why
             // and http://blog.csdn.net/zhangweixing0/article/details/7356841
@@ -185,8 +196,7 @@ namespace v2rayN.HttpProxyHandler
                     //}
                 }
             }
+#endif
         }
-
-
     }
 }
