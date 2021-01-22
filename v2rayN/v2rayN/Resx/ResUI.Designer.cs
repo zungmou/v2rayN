@@ -628,6 +628,15 @@ namespace v2rayN.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Operation success 的本地化字符串。
+        /// </summary>
+        internal static string OperationSuccess {
+            get {
+                return ResourceManager.GetString("OperationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Please Fill Remarks 的本地化字符串。
         /// </summary>
         internal static string PleaseFillRemarks {
@@ -651,6 +660,15 @@ namespace v2rayN.Resx {
         internal static string PleaseSelectProtocol {
             get {
                 return ResourceManager.GetString("PleaseSelectProtocol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Please select rules 的本地化字符串。
+        /// </summary>
+        internal static string PleaseSelectRules {
+            get {
+                return ResourceManager.GetString("PleaseSelectRules", resourceCulture);
             }
         }
         
@@ -682,11 +700,29 @@ namespace v2rayN.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Are you sure to remove the rules? 的本地化字符串。
+        /// </summary>
+        internal static string RemoveRules {
+            get {
+                return ResourceManager.GetString("RemoveRules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Are you sure to remove the server? 的本地化字符串。
         /// </summary>
         internal static string RemoveServer {
             get {
                 return ResourceManager.GetString("RemoveServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 {0},One of the required. 的本地化字符串。
+        /// </summary>
+        internal static string RoutingRuleDetailRequiredTips {
+            get {
+                return ResourceManager.GetString("RoutingRuleDetailRequiredTips", resourceCulture);
             }
         }
         
