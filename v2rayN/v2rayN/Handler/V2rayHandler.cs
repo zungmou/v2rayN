@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using v2rayN.Mode;
 
 namespace v2rayN.Handler
@@ -180,7 +182,20 @@ namespace v2rayN.Handler
             foreach (string name in lstV2ray)
             {
                 string vName = string.Format("{0}.exe", name);
-                vName = Utils.GetPath(vName);
+
+                // 在当前目录下搜索（包括子目录）V2Ray内核程序。
+                // 支持将 V2Ray 内核程序放置于一个子目录下。
+                string search = Directory.EnumerateFiles(Application.StartupPath, vName, SearchOption.AllDirectories).FirstOrDefault();
+
+                if (search != null)
+                {
+                    vName = search;
+                }
+                else
+                {
+                    vName = Utils.GetPath(vName);
+                }
+
                 if (File.Exists(vName))
                 {
                     fileName = vName;
