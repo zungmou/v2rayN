@@ -61,13 +61,6 @@ namespace v2rayN.Mode
         }
 
         /// <summary>
-        /// 域名解析策略
-        /// </summary>
-        public string domainStrategy
-        {
-            get; set;
-        }
-        /// <summary>
         /// KcpItem
         /// </summary>
         public KcpItem kcpItem
@@ -161,11 +154,22 @@ namespace v2rayN.Mode
         {
             get; set;
         }
-        public List<RulesItem> rules
+        /// <summary>
+        /// 域名解析策略
+        /// </summary>
+        public string domainStrategy
         {
             get; set;
         }
-        public List<SubItem> ruleSubItem
+        public int routingIndex
+        {
+            get; set;
+        }
+        public List<RoutingItem> routings
+        {
+            get; set;
+        }
+        public bool enableRoutingAdvanced
         {
             get; set;
         }

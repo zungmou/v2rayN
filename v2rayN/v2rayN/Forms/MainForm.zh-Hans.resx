@@ -299,7 +299,7 @@
     <value>  服务器  </value>
   </data>
   <data name="cmsLv.Size" type="System.Drawing.Size, System.Drawing">
-    <value>301, 600</value>
+    <value>301, 622</value>
   </data>
   <data name="lvServers.Items" mimetype="application/x-microsoft.net.object.binary.base64">
     <value>
@@ -319,19 +319,19 @@
 </value>
   </data>
   <data name="menuKeepClear.Size" type="System.Drawing.Size, System.Drawing">
-    <value>228, 22</value>
+    <value>172, 22</value>
   </data>
   <data name="menuKeepClear.Text" xml:space="preserve">
     <value>清除系统代理</value>
   </data>
   <data name="menuGlobal.Size" type="System.Drawing.Size, System.Drawing">
-    <value>228, 22</value>
+    <value>172, 22</value>
   </data>
   <data name="menuGlobal.Text" xml:space="preserve">
-    <value>自动配置系统代理(全局模式)</value>
+    <value>自动配置系统代理</value>
   </data>
   <data name="menuKeepNothing.Size" type="System.Drawing.Size, System.Drawing">
-    <value>228, 22</value>
+    <value>172, 22</value>
   </data>
   <data name="menuKeepNothing.Text" xml:space="preserve">
     <value>不改变系统代理</value>
@@ -342,11 +342,20 @@
   <data name="menuSysAgentMode.Text" xml:space="preserve">
     <value>系统代理</value>
   </data>
+  <data name="menuRoutings.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="menuRoutings.Text" xml:space="preserve">
+    <value>路由</value>
+  </data>
   <data name="menuServers.Size" type="System.Drawing.Size, System.Drawing">
     <value>195, 22</value>
   </data>
   <data name="menuServers.Text" xml:space="preserve">
     <value>服务器</value>
+  </data>
+  <data name="toolStripSeparator13.Size" type="System.Drawing.Size, System.Drawing">
+    <value>192, 6</value>
   </data>
   <data name="menuAddServers2.Size" type="System.Drawing.Size, System.Drawing">
     <value>195, 22</value>
@@ -376,10 +385,37 @@
     <value>退出</value>
   </data>
   <data name="cmsMain.Size" type="System.Drawing.Size, System.Drawing">
-    <value>196, 142</value>
+    <value>196, 170</value>
   </data>
   <data name="groupBox1.Text" xml:space="preserve">
     <value>服务器列表</value>
+  </data>
+  <data name="menuMsgBoxSelectAll.Size" type="System.Drawing.Size, System.Drawing">
+    <value>221, 22</value>
+  </data>
+  <data name="menuMsgBoxSelectAll.Text" xml:space="preserve">
+    <value>全选 (Ctrl+A)</value>
+  </data>
+  <data name="menuMsgBoxCopy.Size" type="System.Drawing.Size, System.Drawing">
+    <value>221, 22</value>
+  </data>
+  <data name="menuMsgBoxCopy.Text" xml:space="preserve">
+    <value>复制 (Ctrl+C)</value>
+  </data>
+  <data name="menuMsgBoxCopyAll.Size" type="System.Drawing.Size, System.Drawing">
+    <value>221, 22</value>
+  </data>
+  <data name="menuMsgBoxCopyAll.Text" xml:space="preserve">
+    <value>复制所有</value>
+  </data>
+  <data name="menuMsgBoxAddRoutingRule.Size" type="System.Drawing.Size, System.Drawing">
+    <value>221, 22</value>
+  </data>
+  <data name="menuMsgBoxAddRoutingRule.Text" xml:space="preserve">
+    <value>快速添加路由规则 (Ctrl+V)</value>
+  </data>
+  <data name="cmsMsgBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>222, 114</value>
   </data>
   <data name="toolSslServerSpeed.Text" xml:space="preserve">
     <value>网速显示未启用</value>

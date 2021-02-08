@@ -10,6 +10,7 @@ namespace v2rayN.Forms
     public partial class RoutingSettingForm : BaseForm
     {
         private List<int> lvSelecteds = new List<int>();
+        private RoutingItem lockedItem;
         public RoutingSettingForm()
         {
             InitializeComponent();
@@ -17,65 +18,41 @@ namespace v2rayN.Forms
 
         private void RoutingSettingForm_Load(object sender, EventArgs e)
         {
-            cmbdomainStrategy.Text = config.domainStrategy;
+            ConfigHandler.InitBuiltinRouting(ref config);
 
-            if (config.rules == null)
+            cmbdomainStrategy.Text = config.domainStrategy;
+            chkenableRoutingAdvanced.Checked = config.enableRoutingAdvanced;
+
+            if (config.routings == null)
             {
-                config.rules = new List<RulesItem>();
+                config.routings = new List<RoutingItem>();
             }
             InitRoutingsView();
             RefreshRoutingsView();
+
+            BindingLockedData();
+            InitUI();
         }
 
-        private void InitRoutingsView()
+
+        private void tabNormal_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            lvRoutings.BeginUpdate();
-            lvRoutings.Items.Clear();
-
-            lvRoutings.GridLines = true;
-            lvRoutings.FullRowSelect = true;
-            lvRoutings.View = View.Details;
-            lvRoutings.MultiSelect = true;
-            lvRoutings.HeaderStyle = ColumnHeaderStyle.Clickable;
-
-            lvRoutings.Columns.Add("", 30);
-            lvRoutings.Columns.Add(UIRes.I18N("LvAlias"), 100);
-            lvRoutings.Columns.Add("outboundTag", 80);
-            lvRoutings.Columns.Add("port", 80);
-            lvRoutings.Columns.Add("protocol", 100);
-            lvRoutings.Columns.Add("domain", 160);
-            lvRoutings.Columns.Add("ip", 160);
-
-            lvRoutings.EndUpdate();
+            //if (tabNormal.SelectedTab == tabPageRuleList)
+            //{
+            //    MenuItem1.Enabled = true;
+            //}
+            //else
+            //{
+            //    MenuItem1.Enabled = false;
+            //}
         }
-
-        private void RefreshRoutingsView()
-        {
-            lvRoutings.BeginUpdate();
-            lvRoutings.Items.Clear();
-
-            for (int k = 0; k < config.rules.Count; k++)
-            {
-                var item = config.rules[k];
-
-                ListViewItem lvItem = new ListViewItem("");
-                Utils.AddSubItem(lvItem, "remarks", item.remarks);
-                Utils.AddSubItem(lvItem, "outboundTag", item.outboundTag);
-                Utils.AddSubItem(lvItem, "port", item.port);
-                Utils.AddSubItem(lvItem, "protocol", Utils.List2String(item.protocol));
-                Utils.AddSubItem(lvItem, "domain", Utils.List2String(item.domain));
-                Utils.AddSubItem(lvItem, "ip", Utils.List2String(item.ip));
-
-                if (lvItem != null) lvRoutings.Items.Add(lvItem);
-            }
-            lvRoutings.EndUpdate();
-        }
-
         private void btnOK_Click(object sender, EventArgs e)
         {
             config.domainStrategy = cmbdomainStrategy.Text;
+            config.enableRoutingAdvanced = chkenableRoutingAdvanced.Checked;
+            EndBindingLockedData();
 
-            if (ConfigHandler.SaveRoutingRulesItem(ref config) == 0)
+            if (ConfigHandler.SaveRouting(ref config) == 0)
             {
                 this.DialogResult = DialogResult.OK;
             }
@@ -89,6 +66,117 @@ namespace v2rayN.Forms
         {
             this.DialogResult = DialogResult.Cancel;
         }
+        private void chkenableRoutingAdvanced_CheckedChanged_1(object sender, EventArgs e)
+        {
+            InitUI();
+        }
+        private void InitUI()
+        {
+            if (chkenableRoutingAdvanced.Checked)
+            {
+                this.tabPageProxy.Parent = null;
+                this.tabPageDirect.Parent = null;
+                this.tabPageBlock.Parent = null;
+                this.tabPageRuleList.Parent = tabNormal;
+                MenuItemBasic.Enabled = false;
+                MenuItemAdvanced.Enabled = true;
+
+            }
+            else
+            {
+                this.tabPageProxy.Parent = tabNormal;
+                this.tabPageDirect.Parent = tabNormal;
+                this.tabPageBlock.Parent = tabNormal;
+                this.tabPageRuleList.Parent = null;
+                MenuItemBasic.Enabled = true;
+                MenuItemAdvanced.Enabled = false;
+            }
+
+        }
+
+
+        #region locked
+        private void BindingLockedData()
+        {
+            lockedItem = ConfigHandler.GetLockedRoutingItem(ref config);
+            if (lockedItem != null)
+            {
+                txtProxyDomain.Text = Utils.List2String(lockedItem.rules[0].domain, true);
+                txtProxyIp.Text = Utils.List2String(lockedItem.rules[0].ip, true);
+
+                txtDirectDomain.Text = Utils.List2String(lockedItem.rules[1].domain, true);
+                txtDirectIp.Text = Utils.List2String(lockedItem.rules[1].ip, true);
+
+                txtBlockDomain.Text = Utils.List2String(lockedItem.rules[2].domain, true);
+                txtBlockIp.Text = Utils.List2String(lockedItem.rules[2].ip, true);
+            }
+        }
+        private void EndBindingLockedData()
+        {
+            if (lockedItem != null)
+            {
+                lockedItem.rules[0].domain = Utils.String2List(txtProxyDomain.Text.TrimEx());
+                lockedItem.rules[0].ip = Utils.String2List(txtProxyIp.Text.TrimEx());
+
+                lockedItem.rules[1].domain = Utils.String2List(txtDirectDomain.Text.TrimEx());
+                lockedItem.rules[1].ip = Utils.String2List(txtDirectIp.Text.TrimEx());
+
+                lockedItem.rules[2].domain = Utils.String2List(txtBlockDomain.Text.TrimEx());
+                lockedItem.rules[2].ip = Utils.String2List(txtBlockIp.Text.TrimEx());
+
+            }
+        }
+        #endregion
+
+        #region ListView
+        private void InitRoutingsView()
+        {
+            lvRoutings.BeginUpdate();
+            lvRoutings.Items.Clear();
+
+            lvRoutings.GridLines = true;
+            lvRoutings.FullRowSelect = true;
+            lvRoutings.View = View.Details;
+            lvRoutings.MultiSelect = true;
+            lvRoutings.HeaderStyle = ColumnHeaderStyle.Clickable;
+
+            lvRoutings.Columns.Add("", 30);
+            lvRoutings.Columns.Add(UIRes.I18N("LvAlias"), 200);
+            lvRoutings.Columns.Add(UIRes.I18N("LvCount"), 60);
+            lvRoutings.Columns.Add(UIRes.I18N("LvUrl"), 240);
+
+            lvRoutings.EndUpdate();
+        }
+
+        private void RefreshRoutingsView()
+        {
+            lvRoutings.BeginUpdate();
+            lvRoutings.Items.Clear();
+
+            for (int k = 0; k < config.routings.Count; k++)
+            {
+                var item = config.routings[k];
+                if (item.locked == true)
+                {
+                    continue;
+                }
+
+                string def = string.Empty;
+                if (config.routingIndex.Equals(k))
+                {
+                    def = "√";
+                }
+
+                ListViewItem lvItem = new ListViewItem(def);
+                Utils.AddSubItem(lvItem, "remarks", item.remarks);
+                Utils.AddSubItem(lvItem, "count", item.rules.Count.ToString());
+                Utils.AddSubItem(lvItem, "url", item.url);
+
+                if (lvItem != null) lvRoutings.Items.Add(lvItem);
+            }
+            lvRoutings.EndUpdate();
+        }
+
 
         private void linkLabelRoutingDoc_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
@@ -102,7 +190,7 @@ namespace v2rayN.Forms
             {
                 return;
             }
-            var fm = new RoutingSettingDetailsForm();
+            var fm = new RoutingRuleSettingForm();
             fm.EditIndex = index;
             if (fm.ShowDialog() == DialogResult.OK)
             {
@@ -135,41 +223,12 @@ namespace v2rayN.Forms
             }
         }
 
+        #endregion
+
+
         #region Edit function
 
-        private void menuMoveTop_Click(object sender, EventArgs e)
-        {
-            MoveRule(EMove.Top);
-        }
 
-        private void menuMoveUp_Click(object sender, EventArgs e)
-        {
-            MoveRule(EMove.Up);
-        }
-
-        private void menuMoveDown_Click(object sender, EventArgs e)
-        {
-            MoveRule(EMove.Down);
-        }
-
-        private void menuMoveBottom_Click(object sender, EventArgs e)
-        {
-            MoveRule(EMove.Bottom);
-        }
-
-        private void MoveRule(EMove eMove)
-        {
-            int index = GetLvSelectedIndex();
-            if (index < 0)
-            {
-                UI.Show(UIRes.I18N("PleaseSelectRules"));
-                return;
-            }
-            if (ConfigHandler.MoveRoutingRule(ref config, index, eMove) == 0)
-            {
-                RefreshRoutingsView();
-            }
-        }
         private void menuSelectAll_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in lvRoutings.Items)
@@ -180,7 +239,7 @@ namespace v2rayN.Forms
 
         private void menuAdd_Click(object sender, EventArgs e)
         {
-            var fm = new RoutingSettingDetailsForm();
+            var fm = new RoutingRuleSettingForm();
             fm.EditIndex = -1;
             if (fm.ShowDialog() == DialogResult.OK)
             {
@@ -201,131 +260,43 @@ namespace v2rayN.Forms
             }
             for (int k = lvSelecteds.Count - 1; k >= 0; k--)
             {
-                config.rules.RemoveAt(index);
+                config.routings.RemoveAt(index);
             }
             RefreshRoutingsView();
         }
-        private void menuExportSelectedRules_Click(object sender, EventArgs e)
+        private void menuSetDefaultRouting_Click(object sender, EventArgs e)
         {
-            GetLvSelectedIndex();
-            var lst = new List<RulesItem>();
-            foreach (int v in lvSelecteds)
-            {
-                lst.Add(config.rules[v]);
-            }
-            if (lst.Count > 0)
-            {
-                Utils.SetClipboardData(Utils.ToJson(lst));
-                UI.Show(UIRes.I18N("OperationSuccess"));
-            }
-
-        }
-
-        private void lvRoutings_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Control)
-            {
-                switch (e.KeyCode)
-                {
-                    case Keys.A:
-                        menuSelectAll_Click(null, null);
-                        break;
-                    case Keys.C:
-                        menuExportSelectedRules_Click(null, null);
-                        break;
-                }
-            }
-            else
-            {
-                switch (e.KeyCode)
-                {
-                    case Keys.Delete:
-                        menuRemove_Click(null, null);
-                        break;
-                    case Keys.T:
-                        menuMoveTop_Click(null, null);
-                        break;
-                    case Keys.B:
-                        menuMoveBottom_Click(null, null);
-                        break;
-                    case Keys.U:
-                        menuMoveUp_Click(null, null);
-                        break;
-                    case Keys.D:
-                        menuMoveDown_Click(null, null);
-                        break;
-                }
-            }
-        }
-        #endregion
-
-        #region preset rules
-        private void menuImportRulesFromPreset_Click(object sender, EventArgs e)
-        {
-            var rules = Utils.GetEmbedText(Global.CustomRoutingFileName + "rules");
-            if (ConfigHandler.AddBatchRoutingRules(ref config, rules) == 0)
-            {
-                RefreshRoutingsView();
-                UI.Show(UIRes.I18N("OperationSuccess"));
-            }
-        }
-
-        private void menuImportRulesFromFile_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog fileDialog = new OpenFileDialog
-            {
-                Multiselect = false,
-                Filter = "Rules|*.json|All|*.*"
-            };
-            if (fileDialog.ShowDialog() != DialogResult.OK)
+            int index = GetLvSelectedIndex();
+            if (index < 0)
             {
                 return;
             }
-            string fileName = fileDialog.FileName;
-            if (Utils.IsNullOrEmpty(fileName))
+            SetDefaultRouting(index);
+        }
+        private int SetDefaultRouting(int index)
+        {
+            if (index < 0)
             {
-                return;
+                UI.Show(UIRes.I18N("PleaseSelectServer"));
+                return -1;
             }
-            string result = Utils.LoadResource(fileName);
-            if (Utils.IsNullOrEmpty(result))
-            {
-                return;
-            }
-            if (ConfigHandler.AddBatchRoutingRules(ref config, result) == 0)
+            if (ConfigHandler.SetDefaultRouting(ref config, index) == 0)
             {
                 RefreshRoutingsView();
-                UI.Show(UIRes.I18N("OperationSuccess"));
             }
+            return 0;
         }
 
-        private void menuImportRulesFromClipboard_Click(object sender, EventArgs e)
+        private void menuImportBasicRules_Click(object sender, EventArgs e)
         {
-            string clipboardData = Utils.GetClipboardData();
-            if (ConfigHandler.AddBatchRoutingRules(ref config, clipboardData) == 0)
-            {
-                RefreshRoutingsView();
-                UI.Show(UIRes.I18N("OperationSuccess"));
-            }
-        }
-        private void menuImportRulesFromUrl_Click(object sender, EventArgs e)
-        {
-            var fm = new RoutingSubSettingForm();
-            if (fm.ShowDialog() != DialogResult.OK)
-            {
-                return;
-            }
-            var url = fm.Url;
-            DownloadHandle downloadHandle = new DownloadHandle();
-            string clipboardData = downloadHandle.WebDownloadStringSync(url);
-            if (ConfigHandler.AddBatchRoutingRules(ref config, clipboardData) == 0)
-            {
-                RefreshRoutingsView();
-                UI.Show(UIRes.I18N("OperationSuccess"));
-            }
+            //Extra to bypass the mainland
+            txtDirectDomain.Text = "geosite:cn";
+            txtDirectIp.Text = "geoip:private,geoip:cn";
+
+            txtBlockDomain.Text = "geosite:category-ads-all";
         }
 
         #endregion
-
 
     }
 }

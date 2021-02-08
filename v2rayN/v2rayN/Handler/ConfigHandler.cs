@@ -16,6 +16,8 @@ namespace v2rayN.Handler
     {
         private static string configRes = Global.ConfigFileName;
 
+        #region ConfigHandler
+
         /// <summary>
         /// 载入配置文件
         /// </summary>
@@ -87,10 +89,7 @@ namespace v2rayN.Handler
             {
                 config.domainStrategy = "IPIfNonMatch";
             }
-            if (config.rules == null)
-            {
-                config.rules = new List<RulesItem>();
-            }
+
             //kcp
             if (config.kcpItem == null)
             {
@@ -136,10 +135,6 @@ namespace v2rayN.Handler
             {
                 config.subItem = new List<SubItem>();
             }
-            if (config.ruleSubItem == null)
-            {
-                config.ruleSubItem = new List<SubItem>();
-            }
 
             if (config == null
                 || config.index < 0
@@ -163,6 +158,10 @@ namespace v2rayN.Handler
 
             return 0;
         }
+
+        #endregion
+
+        #region Server
 
         /// <summary>
         /// 添加服务器或编辑
@@ -529,8 +528,7 @@ namespace v2rayN.Handler
             vmessItem.id = vmessItem.id.TrimEx();
             vmessItem.security = vmessItem.security.TrimEx();
 
-            var securitys = new HashSet<string>() { "aes-256-gcm", "aes-128-gcm", "chacha20-poly1305", "chacha20-ietf-poly1305", "none", "plain" };
-            if (!securitys.Contains(vmessItem.security))
+            if (!Global.ssSecuritys.Contains(vmessItem.security))
             {
                 return -1;
             }
@@ -861,38 +859,6 @@ namespace v2rayN.Handler
             return 0;
         }
 
-        public static int AddformMainLvColWidth(ref Config config, string name, int width)
-        {
-            if (config.uiItem.mainLvColWidth == null)
-            {
-                config.uiItem.mainLvColWidth = new Dictionary<string, int>();
-            }
-            if (config.uiItem.mainLvColWidth.ContainsKey(name))
-            {
-                config.uiItem.mainLvColWidth[name] = width;
-            }
-            else
-            {
-                config.uiItem.mainLvColWidth.Add(name, width);
-            }
-            return 0;
-        }
-        public static int GetformMainLvColWidth(ref Config config, string name, int width)
-        {
-            if (config.uiItem.mainLvColWidth == null)
-            {
-                config.uiItem.mainLvColWidth = new Dictionary<string, int>();
-            }
-            if (config.uiItem.mainLvColWidth.ContainsKey(name))
-            {
-                return config.uiItem.mainLvColWidth[name];
-            }
-            else
-            {
-                return width;
-            }
-        }
-
         public static int SortServers(ref Config config, EServerColName name, bool asc)
         {
             if (config.vmess.Count <= 0)
@@ -984,47 +950,86 @@ namespace v2rayN.Handler
             return 0;
         }
 
+        #endregion
 
-        /// <summary>
-        /// SaveRoutingItem
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        public static int SaveRoutingRulesItem(ref Config config)
+        #region UI
+
+        public static int AddformMainLvColWidth(ref Config config, string name, int width)
         {
-            if (config.rules == null)
+            if (config.uiItem.mainLvColWidth == null)
+            {
+                config.uiItem.mainLvColWidth = new Dictionary<string, int>();
+            }
+            if (config.uiItem.mainLvColWidth.ContainsKey(name))
+            {
+                config.uiItem.mainLvColWidth[name] = width;
+            }
+            else
+            {
+                config.uiItem.mainLvColWidth.Add(name, width);
+            }
+            return 0;
+        }
+        public static int GetformMainLvColWidth(ref Config config, string name, int width)
+        {
+            if (config.uiItem.mainLvColWidth == null)
+            {
+                config.uiItem.mainLvColWidth = new Dictionary<string, int>();
+            }
+            if (config.uiItem.mainLvColWidth.ContainsKey(name))
+            {
+                return config.uiItem.mainLvColWidth[name];
+            }
+            else
+            {
+                return width;
+            }
+        }
+
+        #endregion
+
+        #region Routing
+
+        public static int SaveRouting(ref Config config)
+        {
+            if (config.routings == null)
             {
                 return -1;
             }
 
-            foreach (RulesItem sub in config.rules)
+            foreach (var item in config.routings)
             {
 
             }
+            //move locked item
+            int index = config.routings.FindIndex(it => it.locked == true);
+            if (index != -1)
+            {
+                var item = Utils.DeepCopy(config.routings[index]);
+                config.routings.RemoveAt(index);
+                config.routings.Add(item);
+            }
+            if (config.routingIndex >= config.routings.Count)
+            {
+                config.routingIndex = 0;
+            }
+
             Global.reloadV2ray = true;
 
             ToJsonFile(config);
             return 0;
         }
-        /// <summary>
-        /// AddRoutingRulesItem
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="item"></param>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public static int AddRoutingRule(ref Config config, RulesItem item, int index)
+
+        public static int AddRoutingItem(ref Config config, RoutingItem item, int index)
         {
             if (index >= 0)
             {
-                config.rules[index] = item;
+                config.routings[index] = item;
             }
             else
             {
-                config.rules.Add(item);
+                config.routings.Add(item);
             }
-            Global.reloadV2ray = true;
-
             ToJsonFile(config);
 
             return 0;
@@ -1036,7 +1041,7 @@ namespace v2rayN.Handler
         /// <param name="config"></param>
         /// <param name="clipboardData"></param>
         /// <returns></returns>
-        public static int AddBatchRoutingRules(ref Config config, string clipboardData)
+        public static int AddBatchRoutingRules(ref RoutingItem routingItem, string clipboardData)
         {
             if (Utils.IsNullOrEmpty(clipboardData))
             {
@@ -1049,30 +1054,25 @@ namespace v2rayN.Handler
                 return -1;
             }
 
-            config.rules.Clear();
+            routingItem.rules.Clear();
             foreach (var item in lstRules)
             {
-                config.rules.Add(item);
+                routingItem.rules.Add(item);
             }
-
-            Global.reloadV2ray = true;
-
-            ToJsonFile(config);
-
             return 0;
         }
 
         /// <summary>
         /// MoveRoutingRule
         /// </summary>
-        /// <param name="config"></param>
+        /// <param name="routingItem"></param>
         /// <param name="index"></param>
         /// <param name="eMove"></param>
         /// <returns></returns>
-        public static int MoveRoutingRule(ref Config config, int index, EMove eMove)
+        public static int MoveRoutingRule(ref RoutingItem routingItem, int index, EMove eMove)
         {
-            int count = config.rules.Count;
-            if (index < 0 || index > config.rules.Count - 1)
+            int count = routingItem.rules.Count;
+            if (index < 0 || index > routingItem.rules.Count - 1)
             {
                 return -1;
             }
@@ -1084,9 +1084,9 @@ namespace v2rayN.Handler
                         {
                             return 0;
                         }
-                        var item = Utils.DeepCopy(config.rules[index]);
-                        config.rules.RemoveAt(index);
-                        config.rules.Insert(0, item);
+                        var item = Utils.DeepCopy(routingItem.rules[index]);
+                        routingItem.rules.RemoveAt(index);
+                        routingItem.rules.Insert(0, item);
 
                         break;
                     }
@@ -1096,9 +1096,9 @@ namespace v2rayN.Handler
                         {
                             return 0;
                         }
-                        var item = Utils.DeepCopy(config.rules[index]);
-                        config.rules.RemoveAt(index);
-                        config.rules.Insert(index - 1, item);
+                        var item = Utils.DeepCopy(routingItem.rules[index]);
+                        routingItem.rules.RemoveAt(index);
+                        routingItem.rules.Insert(index - 1, item);
 
                         break;
                     }
@@ -1109,9 +1109,9 @@ namespace v2rayN.Handler
                         {
                             return 0;
                         }
-                        var item = Utils.DeepCopy(config.rules[index]);
-                        config.rules.RemoveAt(index);
-                        config.rules.Insert(index + 1, item);
+                        var item = Utils.DeepCopy(routingItem.rules[index]);
+                        routingItem.rules.RemoveAt(index);
+                        routingItem.rules.Insert(index + 1, item);
 
                         break;
                     }
@@ -1121,14 +1121,30 @@ namespace v2rayN.Handler
                         {
                             return 0;
                         }
-                        var item = Utils.DeepCopy(config.rules[index]);
-                        config.rules.RemoveAt(index);
-                        config.rules.Add(item);
+                        var item = Utils.DeepCopy(routingItem.rules[index]);
+                        routingItem.rules.RemoveAt(index);
+                        routingItem.rules.Add(item);
 
                         break;
                     }
 
             }
+            return 0;
+        }
+
+        public static int SetDefaultRouting(ref Config config, int index)
+        {
+            if (index < 0 || index > config.routings.Count - 1)
+            {
+                return -1;
+            }
+
+            ////和现在相同
+            //if (config.index.Equals(index))
+            //{
+            //    return -1;
+            //}
+            config.routingIndex = index;
             Global.reloadV2ray = true;
 
             ToJsonFile(config);
@@ -1136,28 +1152,50 @@ namespace v2rayN.Handler
             return 0;
         }
 
-        /// <summary>
-        /// SaveRuleSubItem
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        public static int SaveRuleSubItem(ref Config config)
+        public static int InitBuiltinRouting(ref Config config)
         {
-            if (config.ruleSubItem == null || config.ruleSubItem.Count <= 0)
+            if (config.routings == null)
             {
-                return -1;
+                config.routings = new List<RoutingItem>();
+            }
+            if (config.routings.Count <= 0)
+            {
+                //Bypass the mainland
+                var item2 = new RoutingItem();
+                item2.remarks = "绕过大陆(Whitelist)";
+                item2.url = string.Empty;
+                item2.rules = new List<RulesItem>();
+                string result2 = Utils.GetEmbedText(Global.CustomRoutingFileName + "white");
+                AddBatchRoutingRules(ref item2, result2);
+                config.routings.Add(item2);
+
+                config.routingIndex = 0;
+            }
+            
+            if (GetLockedRoutingItem(ref config) == null)
+            {
+                var item1 = new RoutingItem();
+                item1.remarks = "locked";
+                item1.url = string.Empty;
+                item1.rules = new List<RulesItem>();
+                item1.locked = true;
+                string result1 = Utils.GetEmbedText(Global.CustomRoutingFileName + "locked");
+                AddBatchRoutingRules(ref item1, result1);
+                config.routings.Add(item1);
             }
 
-            foreach (SubItem sub in config.ruleSubItem)
-            {
-                if (Utils.IsNullOrEmpty(sub.id))
-                {
-                    sub.id = Utils.GetGUID();
-                }
-            }
-
-            ToJsonFile(config);
+            SaveRouting(ref config);
             return 0;
+        }         
+
+        public static RoutingItem GetLockedRoutingItem(ref Config config)
+        {
+            if (config.routings == null)
+            {
+                return null;
+            }
+            return config.routings.Find(it => it.locked == true);
         }
+        #endregion
     }
 }

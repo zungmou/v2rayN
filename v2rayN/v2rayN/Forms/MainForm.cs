@@ -47,6 +47,7 @@ namespace v2rayN.Forms
         private void MainForm_Load(object sender, EventArgs e)
         {
             ConfigHandler.LoadConfig(ref config);
+            ConfigHandler.InitBuiltinRouting(ref config);
             v2rayHandler = new V2rayHandler();
             v2rayHandler.ProcessEvent += v2rayHandler_ProcessEvent;
 
@@ -73,6 +74,7 @@ namespace v2rayN.Forms
         {
             InitServersView();
             RefreshServers();
+            RefreshRoutingsMenu();
             RestoreUI();
 
             LoadV2ray();
@@ -477,7 +479,6 @@ namespace v2rayN.Forms
             fm.EditIndex = index;
             if (fm.ShowDialog() == DialogResult.OK)
             {
-                //刷新
                 RefreshServers();
                 LoadV2ray();
             }
@@ -568,7 +569,6 @@ namespace v2rayN.Forms
             {
                 ConfigHandler.RemoveServer(ref config, lvSelecteds[k]);
             }
-            //刷新
             RefreshServers();
             LoadV2ray();
 
@@ -583,7 +583,6 @@ namespace v2rayN.Forms
             {
                 config.vmess = servers;
             }
-            //刷新
             RefreshServers();
             LoadV2ray();
             UI.Show(string.Format(UIRes.I18N("RemoveDuplicateServerResult"), oldCount, newCount));
@@ -598,7 +597,6 @@ namespace v2rayN.Forms
             }
             if (ConfigHandler.CopyServer(ref config, index) == 0)
             {
-                //刷新
                 RefreshServers();
             }
         }
@@ -737,7 +735,6 @@ namespace v2rayN.Forms
             OptionSettingForm fm = new OptionSettingForm();
             if (fm.ShowDialog() == DialogResult.OK)
             {
-                //刷新
                 RefreshServers();
                 LoadV2ray();
             }
@@ -745,10 +742,10 @@ namespace v2rayN.Forms
 
         private void tsbRoutingSetting_Click(object sender, EventArgs e)
         {
-            RoutingSettingForm fm = new RoutingSettingForm();
+            var fm = new RoutingSettingForm();
             if (fm.ShowDialog() == DialogResult.OK)
             {
-                //刷新
+                RefreshRoutingsMenu();
                 RefreshServers();
                 LoadV2ray();
             }
@@ -780,7 +777,6 @@ namespace v2rayN.Forms
             }
             if (ConfigHandler.SetDefaultServer(ref config, index) == 0)
             {
-                //刷新
                 RefreshServers();
                 LoadV2ray();
             }
@@ -837,7 +833,6 @@ namespace v2rayN.Forms
 
             if (ConfigHandler.AddCustomServer(ref config, fileName) == 0)
             {
-                //刷新
                 RefreshServers();
                 //LoadV2ray();
                 UI.Show(UIRes.I18N("SuccessfullyImportedCustomServer"));
@@ -869,10 +864,11 @@ namespace v2rayN.Forms
         private void menuAddServers_Click(object sender, EventArgs e)
         {
             string clipboardData = Utils.GetClipboardData();
-            int result = AddBatchServers(clipboardData);
-            if (result > 0)
+            int ret = MainFormHandler.Instance.AddBatchServers(config, clipboardData);
+            if (ret > 0)
             {
-                UI.Show(string.Format(UIRes.I18N("SuccessfullyImportedServerViaClipboard"), result));
+                RefreshServers();
+                UI.Show(string.Format(UIRes.I18N("SuccessfullyImportedServerViaClipboard"), ret));
             }
         }
 
@@ -880,23 +876,6 @@ namespace v2rayN.Forms
         {
             HideForm();
             bgwScan.RunWorkerAsync();
-        }
-
-        private int AddBatchServers(string clipboardData, string subid = "")
-        {
-            int counter;
-            int _Add()
-            {
-                return ConfigHandler.AddBatchServers(ref config, clipboardData, subid);
-            }
-            counter = _Add();
-            if (counter < 1)
-            {
-                clipboardData = Utils.Base64Decode(clipboardData);
-                counter = _Add();
-            }
-            RefreshServers();
-            return counter;
         }
 
         private void menuUpdateSubscriptions_Click(object sender, EventArgs e)
@@ -1388,8 +1367,10 @@ namespace v2rayN.Forms
             }
             else
             {
-                if (AddBatchServers(result) > 0)
+                int ret = MainFormHandler.Instance.AddBatchServers(config, result);
+                if (ret > 0)
                 {
+                    RefreshServers();
                     UI.Show(UIRes.I18N("SuccessfullyImportedServerViaScan"));
                 }
             }
@@ -1456,8 +1437,10 @@ namespace v2rayN.Forms
                         ConfigHandler.RemoveServerViaSubid(ref config, id);
                         AppendText(false, $"{hashCode}{UIRes.I18N("MsgClearSubscription")}");
                         RefreshServers();
-                        if (AddBatchServers(result, id) > 0)
+                        int ret = MainFormHandler.Instance.AddBatchServers(config, result, id);
+                        if (ret > 0)
                         {
+                            RefreshServers();
                         }
                         else
                         {
@@ -1509,5 +1492,112 @@ namespace v2rayN.Forms
 
 
         #endregion
+
+
+        #region RoutingsMenu
+
+        /// <summary>
+        ///  
+        /// </summary>
+        private void RefreshRoutingsMenu()
+        {
+            menuRoutings.Visible = config.enableRoutingAdvanced;
+            if (!config.enableRoutingAdvanced)
+            {
+                return;
+            }
+
+            menuRoutings.DropDownItems.Clear();
+
+            List<ToolStripMenuItem> lst = new List<ToolStripMenuItem>();
+            for (int k = 0; k < config.routings.Count; k++)
+            {
+                var item = config.routings[k];
+                if (item.locked == true)
+                {
+                    continue;
+                }
+                string name = item.remarks;
+
+                ToolStripMenuItem ts = new ToolStripMenuItem(name)
+                {
+                    Tag = k
+                };
+                if (config.routingIndex.Equals(k))
+                {
+                    ts.Checked = true;
+                }
+                ts.Click += new EventHandler(ts_Routing_Click);
+                lst.Add(ts);
+            }
+            menuRoutings.DropDownItems.AddRange(lst.ToArray());
+        }
+
+        private void ts_Routing_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ToolStripItem ts = (ToolStripItem)sender;
+                int index = Utils.ToInt(ts.Tag);
+
+                if (ConfigHandler.SetDefaultRouting(ref config, index) == 0)
+                {
+                    RefreshRoutingsMenu();
+                    LoadV2ray();
+                }
+            }
+            catch
+            {
+            }
+        }
+        #endregion
+
+        #region MsgBoxMenu
+        private void menuMsgBoxSelectAll_Click(object sender, EventArgs e)
+        {
+            this.txtMsgBox.Focus();
+            this.txtMsgBox.SelectAll();
+        }
+
+        private void menuMsgBoxCopy_Click(object sender, EventArgs e)
+        {
+            var data = this.txtMsgBox.SelectedText.TrimEx();
+            Utils.SetClipboardData(data);
+        }
+
+        private void menuMsgBoxCopyAll_Click(object sender, EventArgs e)
+        {
+            var data = this.txtMsgBox.Text;
+            Utils.SetClipboardData(data);
+        }
+        private void menuMsgBoxAddRoutingRule_Click(object sender, EventArgs e)
+        {
+            menuMsgBoxCopy_Click(null, null);
+            tsbRoutingSetting_Click(null, null);
+        }
+
+        private void txtMsgBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.A:
+                        menuMsgBoxSelectAll_Click(null, null);
+                        break;
+                    case Keys.C:
+                        menuMsgBoxCopy_Click(null, null);
+                        break;
+                    case Keys.V:
+                        menuMsgBoxAddRoutingRule_Click(null, null);
+                        break;
+
+                }
+            }
+
+        }
+
+        #endregion
+
     }
 }

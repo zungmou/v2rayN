@@ -32,52 +32,83 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RoutingSettingForm));
             this.btnClose = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.labRoutingTips = new System.Windows.Forms.Label();
             this.btnOK = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.chkenableRoutingAdvanced = new System.Windows.Forms.CheckBox();
             this.linkLabelRoutingDoc = new System.Windows.Forms.LinkLabel();
             this.cmbdomainStrategy = new System.Windows.Forms.ComboBox();
-            this.lvRoutings = new v2rayN.Base.ListViewFlickerFree();
             this.cmsLv = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuAdd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemove = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSelectAll = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuExportSelectedRules = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuMoveTop = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuMoveUp = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuMoveDown = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuMoveBottom = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabControl2 = new System.Windows.Forms.TabControl();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.menuSetDefaultRouting = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.menuServer = new System.Windows.Forms.MenuStrip();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuImportRulesFromPreset = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuImportRulesFromFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuImportRulesFromClipboard = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuImportRulesFromUrl = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemBasic = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuImportBasicRules = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabNormal = new System.Windows.Forms.TabControl();
+            this.tabPageProxy = new System.Windows.Forms.TabPage();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.txtProxyIp = new System.Windows.Forms.TextBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.txtProxyDomain = new System.Windows.Forms.TextBox();
+            this.tabPageDirect = new System.Windows.Forms.TabPage();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.txtDirectIp = new System.Windows.Forms.TextBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.txtDirectDomain = new System.Windows.Forms.TextBox();
+            this.tabPageBlock = new System.Windows.Forms.TabPage();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.txtBlockIp = new System.Windows.Forms.TextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtBlockDomain = new System.Windows.Forms.TextBox();
+            this.tabPageRuleList = new System.Windows.Forms.TabPage();
+            this.lvRoutings = new v2rayN.Base.ListViewFlickerFree();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
             this.cmsLv.SuspendLayout();
-            this.tabControl2.SuspendLayout();
-            this.tabPage2.SuspendLayout();
             this.menuServer.SuspendLayout();
+            this.tabNormal.SuspendLayout();
+            this.tabPageProxy.SuspendLayout();
+            this.panel5.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            this.groupBox6.SuspendLayout();
+            this.tabPageDirect.SuspendLayout();
+            this.panel4.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            this.tabPageBlock.SuspendLayout();
+            this.panel3.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.tabPageRuleList.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnClose
             // 
-            resources.ApplyResources(this.btnClose, "btnClose");
             this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            resources.ApplyResources(this.btnClose, "btnClose");
             this.btnClose.Name = "btnClose";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // panel2
             // 
-            resources.ApplyResources(this.panel2, "panel2");
+            this.panel2.Controls.Add(this.labRoutingTips);
             this.panel2.Controls.Add(this.btnClose);
             this.panel2.Controls.Add(this.btnOK);
+            resources.ApplyResources(this.panel2, "panel2");
             this.panel2.Name = "panel2";
+            // 
+            // labRoutingTips
+            // 
+            this.labRoutingTips.ForeColor = System.Drawing.Color.Brown;
+            resources.ApplyResources(this.labRoutingTips, "labRoutingTips");
+            this.labRoutingTips.Name = "labRoutingTips";
             // 
             // btnOK
             // 
@@ -88,10 +119,18 @@
             // 
             // panel1
             // 
-            resources.ApplyResources(this.panel1, "panel1");
+            this.panel1.Controls.Add(this.chkenableRoutingAdvanced);
             this.panel1.Controls.Add(this.linkLabelRoutingDoc);
             this.panel1.Controls.Add(this.cmbdomainStrategy);
+            resources.ApplyResources(this.panel1, "panel1");
             this.panel1.Name = "panel1";
+            // 
+            // chkenableRoutingAdvanced
+            // 
+            resources.ApplyResources(this.chkenableRoutingAdvanced, "chkenableRoutingAdvanced");
+            this.chkenableRoutingAdvanced.Name = "chkenableRoutingAdvanced";
+            this.chkenableRoutingAdvanced.UseVisualStyleBackColor = true;
+            this.chkenableRoutingAdvanced.CheckedChanged += new System.EventHandler(this.chkenableRoutingAdvanced_CheckedChanged_1);
             // 
             // linkLabelRoutingDoc
             // 
@@ -102,19 +141,214 @@
             // 
             // cmbdomainStrategy
             // 
-            resources.ApplyResources(this.cmbdomainStrategy, "cmbdomainStrategy");
             this.cmbdomainStrategy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbdomainStrategy.FormattingEnabled = true;
             this.cmbdomainStrategy.Items.AddRange(new object[] {
             resources.GetString("cmbdomainStrategy.Items"),
             resources.GetString("cmbdomainStrategy.Items1"),
             resources.GetString("cmbdomainStrategy.Items2")});
+            resources.ApplyResources(this.cmbdomainStrategy, "cmbdomainStrategy");
             this.cmbdomainStrategy.Name = "cmbdomainStrategy";
+            // 
+            // cmsLv
+            // 
+            this.cmsLv.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.cmsLv.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuAdd,
+            this.menuRemove,
+            this.menuSelectAll,
+            this.menuSetDefaultRouting});
+            this.cmsLv.Name = "cmsLv";
+            this.cmsLv.OwnerItem = this.MenuItemAdvanced;
+            resources.ApplyResources(this.cmsLv, "cmsLv");
+            // 
+            // menuAdd
+            // 
+            this.menuAdd.Name = "menuAdd";
+            resources.ApplyResources(this.menuAdd, "menuAdd");
+            this.menuAdd.Click += new System.EventHandler(this.menuAdd_Click);
+            // 
+            // menuRemove
+            // 
+            this.menuRemove.Name = "menuRemove";
+            resources.ApplyResources(this.menuRemove, "menuRemove");
+            this.menuRemove.Click += new System.EventHandler(this.menuRemove_Click);
+            // 
+            // menuSelectAll
+            // 
+            this.menuSelectAll.Name = "menuSelectAll";
+            resources.ApplyResources(this.menuSelectAll, "menuSelectAll");
+            this.menuSelectAll.Click += new System.EventHandler(this.menuSelectAll_Click);
+            // 
+            // menuSetDefaultRouting
+            // 
+            this.menuSetDefaultRouting.Name = "menuSetDefaultRouting";
+            resources.ApplyResources(this.menuSetDefaultRouting, "menuSetDefaultRouting");
+            this.menuSetDefaultRouting.Click += new System.EventHandler(this.menuSetDefaultRouting_Click);
+            // 
+            // MenuItemAdvanced
+            // 
+            this.MenuItemAdvanced.DropDown = this.cmsLv;
+            this.MenuItemAdvanced.Name = "MenuItemAdvanced";
+            resources.ApplyResources(this.MenuItemAdvanced, "MenuItemAdvanced");
+            // 
+            // menuServer
+            // 
+            this.menuServer.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuItemBasic,
+            this.MenuItemAdvanced});
+            resources.ApplyResources(this.menuServer, "menuServer");
+            this.menuServer.Name = "menuServer";
+            // 
+            // MenuItemBasic
+            // 
+            this.MenuItemBasic.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuImportBasicRules});
+            this.MenuItemBasic.Name = "MenuItemBasic";
+            resources.ApplyResources(this.MenuItemBasic, "MenuItemBasic");
+            // 
+            // menuImportBasicRules
+            // 
+            this.menuImportBasicRules.Name = "menuImportBasicRules";
+            resources.ApplyResources(this.menuImportBasicRules, "menuImportBasicRules");
+            this.menuImportBasicRules.Click += new System.EventHandler(this.menuImportBasicRules_Click);
+            // 
+            // tabNormal
+            // 
+            this.tabNormal.Controls.Add(this.tabPageProxy);
+            this.tabNormal.Controls.Add(this.tabPageDirect);
+            this.tabNormal.Controls.Add(this.tabPageBlock);
+            this.tabNormal.Controls.Add(this.tabPageRuleList);
+            resources.ApplyResources(this.tabNormal, "tabNormal");
+            this.tabNormal.Name = "tabNormal";
+            this.tabNormal.SelectedIndex = 0;
+            this.tabNormal.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabNormal_Selecting);
+            // 
+            // tabPageProxy
+            // 
+            this.tabPageProxy.Controls.Add(this.panel5);
+            resources.ApplyResources(this.tabPageProxy, "tabPageProxy");
+            this.tabPageProxy.Name = "tabPageProxy";
+            this.tabPageProxy.UseVisualStyleBackColor = true;
+            // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.groupBox5);
+            this.panel5.Controls.Add(this.groupBox6);
+            resources.ApplyResources(this.panel5, "panel5");
+            this.panel5.Name = "panel5";
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.txtProxyIp);
+            resources.ApplyResources(this.groupBox5, "groupBox5");
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.TabStop = false;
+            // 
+            // txtProxyIp
+            // 
+            resources.ApplyResources(this.txtProxyIp, "txtProxyIp");
+            this.txtProxyIp.Name = "txtProxyIp";
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.txtProxyDomain);
+            resources.ApplyResources(this.groupBox6, "groupBox6");
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.TabStop = false;
+            // 
+            // txtProxyDomain
+            // 
+            resources.ApplyResources(this.txtProxyDomain, "txtProxyDomain");
+            this.txtProxyDomain.Name = "txtProxyDomain";
+            // 
+            // tabPageDirect
+            // 
+            this.tabPageDirect.Controls.Add(this.panel4);
+            resources.ApplyResources(this.tabPageDirect, "tabPageDirect");
+            this.tabPageDirect.Name = "tabPageDirect";
+            this.tabPageDirect.UseVisualStyleBackColor = true;
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.groupBox3);
+            this.panel4.Controls.Add(this.groupBox4);
+            resources.ApplyResources(this.panel4, "panel4");
+            this.panel4.Name = "panel4";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.txtDirectIp);
+            resources.ApplyResources(this.groupBox3, "groupBox3");
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.TabStop = false;
+            // 
+            // txtDirectIp
+            // 
+            resources.ApplyResources(this.txtDirectIp, "txtDirectIp");
+            this.txtDirectIp.Name = "txtDirectIp";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.txtDirectDomain);
+            resources.ApplyResources(this.groupBox4, "groupBox4");
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.TabStop = false;
+            // 
+            // txtDirectDomain
+            // 
+            resources.ApplyResources(this.txtDirectDomain, "txtDirectDomain");
+            this.txtDirectDomain.Name = "txtDirectDomain";
+            // 
+            // tabPageBlock
+            // 
+            this.tabPageBlock.Controls.Add(this.panel3);
+            resources.ApplyResources(this.tabPageBlock, "tabPageBlock");
+            this.tabPageBlock.Name = "tabPageBlock";
+            this.tabPageBlock.UseVisualStyleBackColor = true;
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.groupBox2);
+            this.panel3.Controls.Add(this.groupBox1);
+            resources.ApplyResources(this.panel3, "panel3");
+            this.panel3.Name = "panel3";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.txtBlockIp);
+            resources.ApplyResources(this.groupBox2, "groupBox2");
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.TabStop = false;
+            // 
+            // txtBlockIp
+            // 
+            resources.ApplyResources(this.txtBlockIp, "txtBlockIp");
+            this.txtBlockIp.Name = "txtBlockIp";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.txtBlockDomain);
+            resources.ApplyResources(this.groupBox1, "groupBox1");
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.TabStop = false;
+            // 
+            // txtBlockDomain
+            // 
+            resources.ApplyResources(this.txtBlockDomain, "txtBlockDomain");
+            this.txtBlockDomain.Name = "txtBlockDomain";
+            // 
+            // tabPageRuleList
+            // 
+            this.tabPageRuleList.Controls.Add(this.lvRoutings);
+            resources.ApplyResources(this.tabPageRuleList, "tabPageRuleList");
+            this.tabPageRuleList.Name = "tabPageRuleList";
+            this.tabPageRuleList.UseVisualStyleBackColor = true;
             // 
             // lvRoutings
             // 
-            resources.ApplyResources(this.lvRoutings, "lvRoutings");
             this.lvRoutings.ContextMenuStrip = this.cmsLv;
+            resources.ApplyResources(this.lvRoutings, "lvRoutings");
             this.lvRoutings.FullRowSelect = true;
             this.lvRoutings.GridLines = true;
             this.lvRoutings.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -126,146 +360,13 @@
             this.lvRoutings.UseCompatibleStateImageBehavior = false;
             this.lvRoutings.View = System.Windows.Forms.View.Details;
             this.lvRoutings.DoubleClick += new System.EventHandler(this.lvRoutings_DoubleClick);
-            this.lvRoutings.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lvRoutings_KeyDown);
-            // 
-            // cmsLv
-            // 
-            resources.ApplyResources(this.cmsLv, "cmsLv");
-            this.cmsLv.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.cmsLv.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuAdd,
-            this.menuRemove,
-            this.menuSelectAll,
-            this.menuExportSelectedRules,
-            this.toolStripSeparator3,
-            this.menuMoveTop,
-            this.menuMoveUp,
-            this.menuMoveDown,
-            this.menuMoveBottom});
-            this.cmsLv.Name = "cmsLv";
-            this.cmsLv.OwnerItem = this.MenuItem1;
-            // 
-            // menuAdd
-            // 
-            resources.ApplyResources(this.menuAdd, "menuAdd");
-            this.menuAdd.Name = "menuAdd";
-            this.menuAdd.Click += new System.EventHandler(this.menuAdd_Click);
-            // 
-            // menuRemove
-            // 
-            resources.ApplyResources(this.menuRemove, "menuRemove");
-            this.menuRemove.Name = "menuRemove";
-            this.menuRemove.Click += new System.EventHandler(this.menuRemove_Click);
-            // 
-            // menuSelectAll
-            // 
-            resources.ApplyResources(this.menuSelectAll, "menuSelectAll");
-            this.menuSelectAll.Name = "menuSelectAll";
-            this.menuSelectAll.Click += new System.EventHandler(this.menuSelectAll_Click);
-            // 
-            // menuExportSelectedRules
-            // 
-            resources.ApplyResources(this.menuExportSelectedRules, "menuExportSelectedRules");
-            this.menuExportSelectedRules.Name = "menuExportSelectedRules";
-            this.menuExportSelectedRules.Click += new System.EventHandler(this.menuExportSelectedRules_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            resources.ApplyResources(this.toolStripSeparator3, "toolStripSeparator3");
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            // 
-            // menuMoveTop
-            // 
-            resources.ApplyResources(this.menuMoveTop, "menuMoveTop");
-            this.menuMoveTop.Name = "menuMoveTop";
-            this.menuMoveTop.Click += new System.EventHandler(this.menuMoveTop_Click);
-            // 
-            // menuMoveUp
-            // 
-            resources.ApplyResources(this.menuMoveUp, "menuMoveUp");
-            this.menuMoveUp.Name = "menuMoveUp";
-            this.menuMoveUp.Click += new System.EventHandler(this.menuMoveUp_Click);
-            // 
-            // menuMoveDown
-            // 
-            resources.ApplyResources(this.menuMoveDown, "menuMoveDown");
-            this.menuMoveDown.Name = "menuMoveDown";
-            this.menuMoveDown.Click += new System.EventHandler(this.menuMoveDown_Click);
-            // 
-            // menuMoveBottom
-            // 
-            resources.ApplyResources(this.menuMoveBottom, "menuMoveBottom");
-            this.menuMoveBottom.Name = "menuMoveBottom";
-            this.menuMoveBottom.Click += new System.EventHandler(this.menuMoveBottom_Click);
-            // 
-            // MenuItem1
-            // 
-            resources.ApplyResources(this.MenuItem1, "MenuItem1");
-            this.MenuItem1.DropDown = this.cmsLv;
-            this.MenuItem1.Name = "MenuItem1";
-            // 
-            // tabControl2
-            // 
-            resources.ApplyResources(this.tabControl2, "tabControl2");
-            this.tabControl2.Controls.Add(this.tabPage2);
-            this.tabControl2.Name = "tabControl2";
-            this.tabControl2.SelectedIndex = 0;
-            // 
-            // tabPage2
-            // 
-            resources.ApplyResources(this.tabPage2, "tabPage2");
-            this.tabPage2.Controls.Add(this.lvRoutings);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // menuServer
-            // 
-            resources.ApplyResources(this.menuServer, "menuServer");
-            this.menuServer.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuItem1,
-            this.toolStripMenuItem1});
-            this.menuServer.Name = "menuServer";
-            // 
-            // toolStripMenuItem1
-            // 
-            resources.ApplyResources(this.toolStripMenuItem1, "toolStripMenuItem1");
-            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuImportRulesFromPreset,
-            this.menuImportRulesFromFile,
-            this.menuImportRulesFromClipboard,
-            this.menuImportRulesFromUrl});
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            // 
-            // menuImportRulesFromPreset
-            // 
-            resources.ApplyResources(this.menuImportRulesFromPreset, "menuImportRulesFromPreset");
-            this.menuImportRulesFromPreset.Name = "menuImportRulesFromPreset";
-            this.menuImportRulesFromPreset.Click += new System.EventHandler(this.menuImportRulesFromPreset_Click);
-            // 
-            // menuImportRulesFromFile
-            // 
-            resources.ApplyResources(this.menuImportRulesFromFile, "menuImportRulesFromFile");
-            this.menuImportRulesFromFile.Name = "menuImportRulesFromFile";
-            this.menuImportRulesFromFile.Click += new System.EventHandler(this.menuImportRulesFromFile_Click);
-            // 
-            // menuImportRulesFromClipboard
-            // 
-            resources.ApplyResources(this.menuImportRulesFromClipboard, "menuImportRulesFromClipboard");
-            this.menuImportRulesFromClipboard.Name = "menuImportRulesFromClipboard";
-            this.menuImportRulesFromClipboard.Click += new System.EventHandler(this.menuImportRulesFromClipboard_Click);
-            // 
-            // menuImportRulesFromUrl
-            // 
-            resources.ApplyResources(this.menuImportRulesFromUrl, "menuImportRulesFromUrl");
-            this.menuImportRulesFromUrl.Name = "menuImportRulesFromUrl";
-            this.menuImportRulesFromUrl.Click += new System.EventHandler(this.menuImportRulesFromUrl_Click);
             // 
             // RoutingSettingForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnClose;
-            this.Controls.Add(this.tabControl2);
+            this.Controls.Add(this.tabNormal);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.menuServer);
@@ -276,10 +377,28 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.cmsLv.ResumeLayout(false);
-            this.tabControl2.ResumeLayout(false);
-            this.tabPage2.ResumeLayout(false);
             this.menuServer.ResumeLayout(false);
             this.menuServer.PerformLayout();
+            this.tabNormal.ResumeLayout(false);
+            this.tabPageProxy.ResumeLayout(false);
+            this.panel5.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
+            this.tabPageDirect.ResumeLayout(false);
+            this.panel4.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            this.tabPageBlock.ResumeLayout(false);
+            this.panel3.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.tabPageRuleList.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -292,25 +411,37 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.LinkLabel linkLabelRoutingDoc;
         private System.Windows.Forms.ComboBox cmbdomainStrategy;
-        private Base.ListViewFlickerFree lvRoutings;
-        private System.Windows.Forms.TabControl tabControl2;
-        private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.ContextMenuStrip cmsLv;
         private System.Windows.Forms.ToolStripMenuItem menuRemove;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem menuMoveTop;
-        private System.Windows.Forms.ToolStripMenuItem menuMoveUp;
-        private System.Windows.Forms.ToolStripMenuItem menuMoveDown;
-        private System.Windows.Forms.ToolStripMenuItem menuMoveBottom;
         private System.Windows.Forms.ToolStripMenuItem menuSelectAll;
         private System.Windows.Forms.ToolStripMenuItem menuAdd;
         private System.Windows.Forms.MenuStrip menuServer;
-        private System.Windows.Forms.ToolStripMenuItem MenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem menuImportRulesFromPreset;
-        private System.Windows.Forms.ToolStripMenuItem menuImportRulesFromFile;
-        private System.Windows.Forms.ToolStripMenuItem menuImportRulesFromClipboard;
-        private System.Windows.Forms.ToolStripMenuItem menuExportSelectedRules;
-        private System.Windows.Forms.ToolStripMenuItem menuImportRulesFromUrl;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemAdvanced;
+        private System.Windows.Forms.ToolStripMenuItem menuSetDefaultRouting;
+        private System.Windows.Forms.TabControl tabNormal;
+        private System.Windows.Forms.TabPage tabPageProxy;
+        private System.Windows.Forms.TabPage tabPageDirect;
+        private System.Windows.Forms.TabPage tabPageBlock;
+        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.TextBox txtProxyIp;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.TextBox txtProxyDomain;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox txtDirectIp;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.TextBox txtDirectDomain;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TextBox txtBlockIp;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox txtBlockDomain;
+        private System.Windows.Forms.TabPage tabPageRuleList;
+        private Base.ListViewFlickerFree lvRoutings;
+        private System.Windows.Forms.Label labRoutingTips;
+        private System.Windows.Forms.CheckBox chkenableRoutingAdvanced;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemBasic;
+        private System.Windows.Forms.ToolStripMenuItem menuImportBasicRules;
     }
 }

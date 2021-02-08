@@ -190,9 +190,26 @@ namespace v2rayN.Handler
                 {
                     v2rayConfig.routing.domainStrategy = config.domainStrategy;
 
-                    foreach (var item in config.rules)
+                    if (config.enableRoutingAdvanced)
                     {
-                        routingUserRule(item, ref v2rayConfig);
+                        if (config.routings != null && config.routingIndex < config.routings.Count)
+                        {
+                            foreach (var item in config.routings[config.routingIndex].rules)
+                            {
+                                routingUserRule(item, ref v2rayConfig);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var lockedItem = ConfigHandler.GetLockedRoutingItem(ref config);
+                        if (lockedItem != null)
+                        {
+                            foreach (var item in lockedItem.rules)
+                            {
+                                routingUserRule(item, ref v2rayConfig);
+                            }                         
+                        }
                     }
                 }
             }
@@ -367,7 +384,15 @@ namespace v2rayN.Handler
                     serversItem.address = config.address();
                     serversItem.port = config.port();
                     serversItem.password = config.id();
-                    serversItem.method = config.security();
+                    if (Global.ssSecuritys.Contains(config.security()))
+                    {
+                        serversItem.method = config.security();
+                    }
+                    else
+                    {
+                        serversItem.method = "none";
+                    }
+
 
                     serversItem.ota = false;
                     serversItem.level = 1;
