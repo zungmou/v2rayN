@@ -19,7 +19,8 @@ namespace v2rayN
         /// <summary>
         /// SpeedTestUrl
         /// </summary>
-        public const string SpeedTestUrl = @"http://cachefly.cachefly.net/10mb.test";
+        public const string SpeedTestUrl = @"https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/jquery-speedtest/10MB.txt";
+        //public const string SpeedTestUrl = @"http://cachefly.cachefly.net/10mb.test";
         public const string SpeedPingTestUrl = @"https://www.google.com/generate_204";
         public const string AvailabilityTestUrl = @"https://www.google.com/generate_204";
 

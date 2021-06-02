@@ -1377,6 +1377,10 @@ namespace v2rayN.Handler
                 int httpPort = configCopy.GetLocalPort("speedtest");
                 foreach (int index in selecteds)
                 {
+                    // 某些特殊节点可能是机场向用户展示信息，无效的的端口号会导致批量测速时生成无效的v2ray配置。
+                    if (configCopy.vmess[index].port > 65535)
+                        continue;
+
                     if (configCopy.vmess[index].configType == (int)EConfigType.Custom)
                     {
                         continue;
