@@ -208,7 +208,7 @@ namespace v2rayN.Handler
                             foreach (var item in lockedItem.rules)
                             {
                                 routingUserRule(item, ref v2rayConfig);
-                            }                         
+                            }
                         }
                     }
                 }
@@ -249,8 +249,12 @@ namespace v2rayN.Handler
                     var it = Utils.DeepCopy(rules);
                     it.ip = null;
                     it.type = "field";
-                    for (int k = 0; k < it.domain.Count; k++)
+                    for (int k = it.domain.Count - 1; k >= 0; k--)
                     {
+                        if (it.domain[k].StartsWith("#"))
+                        {
+                            it.domain.RemoveAt(k);
+                        }
                         it.domain[k] = it.domain[k].Replace(Global.RoutingRuleComma, ",");
                     }
                     //if (Utils.IsNullOrEmpty(it.port))
@@ -553,6 +557,8 @@ namespace v2rayN.Handler
                 //远程服务器底层传输配置
                 streamSettings.network = config.network();
                 string host = config.requestHost();
+                string sni = config.sni();
+
                 //if tls
                 if (config.streamSecurity() == Global.StreamSecurity)
                 {
@@ -562,7 +568,11 @@ namespace v2rayN.Handler
                     {
                         allowInsecure = config.allowInsecure()
                     };
-                    if (!string.IsNullOrWhiteSpace(host))
+                    if (!string.IsNullOrWhiteSpace(sni))
+                    {
+                        tlsSettings.serverName = sni;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(host))
                     {
                         tlsSettings.serverName = Utils.String2List(host)[0];
                     }
@@ -578,7 +588,11 @@ namespace v2rayN.Handler
                     {
                         allowInsecure = config.allowInsecure()
                     };
-                    if (!string.IsNullOrWhiteSpace(host))
+                    if (!string.IsNullOrWhiteSpace(sni))
+                    {
+                        xtlsSettings.serverName = sni;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(host))
                     {
                         xtlsSettings.serverName = Utils.String2List(host)[0];
                     }
@@ -682,8 +696,22 @@ namespace v2rayN.Handler
                         streamSettings.quicSettings = quicsettings;
                         if (config.streamSecurity() == Global.StreamSecurity)
                         {
-                            streamSettings.tlsSettings.serverName = config.address();
+                            if (!string.IsNullOrWhiteSpace(sni))
+                            {
+                                streamSettings.tlsSettings.serverName = sni;
+                            }
+                            else
+                            {
+                                streamSettings.tlsSettings.serverName = config.address();
+                            }
                         }
+                        break;
+                    case "grpc":
+                        var grpcSettings = new GrpcSettings();
+
+                        grpcSettings.serviceName = config.path();
+                        grpcSettings.multiMode = (config.headerType() == Global.GrpcmultiMode ? true : false);
+                        streamSettings.grpcSettings = grpcSettings;
                         break;
                     default:
                         //tcp带http伪装

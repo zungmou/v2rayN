@@ -9,6 +9,7 @@ namespace v2rayN.Handler
     class MainFormHandler
     {
         private static MainFormHandler instance;
+        Action<bool, string> updateUI;
 
         //private DownloadHandle downloadHandle2;
         //private Config _config;
@@ -164,6 +165,104 @@ namespace v2rayN.Handler
 
             return counter;
         }
+
+
+        public void UpdateSubscriptionProcess(Config config, Action<bool, string> update)
+        {
+            updateUI = update;
+
+            updateUI(false, UIRes.I18N("MsgUpdateSubscriptionStart"));
+
+            if (config.subItem == null || config.subItem.Count <= 0)
+            {
+                updateUI(false, UIRes.I18N("MsgNoValidSubscription"));
+                return;
+            }
+
+            for (int k = 1; k <= config.subItem.Count; k++)
+            {
+                string id = config.subItem[k - 1].id.TrimEx();
+                string url = config.subItem[k - 1].url.TrimEx();
+                string hashCode = $"{k}->";
+                if (config.subItem[k - 1].enabled == false)
+                {
+                    continue;
+                }
+                if (Utils.IsNullOrEmpty(id) || Utils.IsNullOrEmpty(url))
+                {
+                    updateUI(false, $"{hashCode}{UIRes.I18N("MsgNoValidSubscription")}");
+                    continue;
+                }
+
+                DownloadHandle downloadHandle3 = new DownloadHandle();
+                downloadHandle3.UpdateCompleted += (sender2, args) =>
+                {
+                    if (args.Success)
+                    {
+                        updateUI(false, $"{hashCode}{UIRes.I18N("MsgGetSubscriptionSuccessfully")}");
+                        string result = Utils.Base64Decode(args.Msg);
+                        if (Utils.IsNullOrEmpty(result))
+                        {
+                            updateUI(false, $"{hashCode}{UIRes.I18N("MsgSubscriptionDecodingFailed")}");
+                            return;
+                        }
+
+                        ConfigHandler.RemoveServerViaSubid(ref config, id);
+                        updateUI(false, $"{hashCode}{UIRes.I18N("MsgClearSubscription")}");
+                        //  RefreshServers();
+                        int ret = MainFormHandler.Instance.AddBatchServers(config, result, id);
+                        if (ret > 0)
+                        {
+                            // RefreshServers();
+                        }
+                        else
+                        {
+                            updateUI(false, $"{hashCode}{UIRes.I18N("MsgFailedImportSubscription")}");
+                        }
+                        updateUI(true, $"{hashCode}{UIRes.I18N("MsgUpdateSubscriptionEnd")}");
+                    }
+                    else
+                    {
+                        updateUI(false, args.Msg);
+                    }
+                };
+                downloadHandle3.Error += (sender2, args) =>
+                {
+                    updateUI(false, args.GetException().Message);
+                };
+
+                downloadHandle3.WebDownloadString(url);
+                updateUI(false, $"{hashCode}{UIRes.I18N("MsgStartGettingSubscriptions")}");
+            }
+
+        }
         
+        public void BackupGuiNConfig(Config config)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog
+            {
+                Filter = "guiNConfig|*.json",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
+            if (fileDialog.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+            string fileName = fileDialog.FileName;
+            if (Utils.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+            if (Utils.ToJsonFile(config, fileName) == 0)
+            {
+                UI.Show(UIRes.I18N("OperationSuccess"));
+            }
+            else
+            {
+                UI.ShowWarning(UIRes.I18N("OperationFailed"));
+            }
+        }
+
     }
 }

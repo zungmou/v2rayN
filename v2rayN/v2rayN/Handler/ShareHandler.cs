@@ -40,11 +40,13 @@ namespace v2rayN.Handler
                         port = item.port.ToString(),
                         id = item.id,
                         aid = item.alterId.ToString(),
+                        scy = item.security,
                         net = item.network,
                         type = item.headerType,
                         host = item.requestHost,
                         path = item.path,
-                        tls = item.streamSecurity
+                        tls = item.streamSecurity,
+                        sni = item.sni
                     };
 
                     url = Utils.ToJson(vmessQRCode);
@@ -90,13 +92,13 @@ namespace v2rayN.Handler
                         remark = "#" + Utils.UrlEncode(item.remarks);
                     }
                     string query = string.Empty;
-                    if (!Utils.IsNullOrEmpty(item.requestHost))
+                    if (!Utils.IsNullOrEmpty(item.sni))
                     {
-                        query = string.Format("?sni={0}", Utils.UrlEncode(item.requestHost));
+                        query = string.Format("?sni={0}", Utils.UrlEncode(item.sni));
                     }
                     url = string.Format("{0}@{1}:{2}",
                         item.id,
-                        item.address,
+                        GetIpv6(item.address),
                         item.port);
                     url = string.Format("{0}{1}{2}{3}", Global.trojanProtocol, url, query, remark);
                 }
@@ -127,6 +129,10 @@ namespace v2rayN.Handler
                     else
                     {
                         dicQuery.Add("security", "none");
+                    }
+                    if (!Utils.IsNullOrEmpty(item.sni))
+                    {
+                        dicQuery.Add("sni", item.sni);
                     }
                     if (!Utils.IsNullOrEmpty(item.network))
                     {
@@ -204,12 +210,22 @@ namespace v2rayN.Handler
                             dicQuery.Add("quicSecurity", Utils.UrlEncode(item.requestHost));
                             dicQuery.Add("key", Utils.UrlEncode(item.path));
                             break;
+                        case "grpc":
+                            if (!Utils.IsNullOrEmpty(item.path))
+                            {
+                                dicQuery.Add("serviceName", Utils.UrlEncode(item.path));
+                                if (item.headerType == Global.GrpcgunMode || item.headerType == Global.GrpcmultiMode)
+                                {
+                                    dicQuery.Add("mode", Utils.UrlEncode(item.headerType));
+                                }
+                            }
+                            break;
                     }
                     string query = "?" + string.Join("&", dicQuery.Select(x => x.Key + "=" + x.Value).ToArray());
 
                     url = string.Format("{0}@{1}:{2}",
                     item.id,
-                    item.address,
+                    GetIpv6(item.address),
                     item.port);
                     url = string.Format("{0}{1}{2}{3}", Global.vlessProtocol, url, query, remark);
                 }
@@ -224,6 +240,10 @@ namespace v2rayN.Handler
             }
         }
 
+        private static string GetIpv6(string address)
+        {
+            return Utils.IsIpv6(address) ? $"[{address}]" : address;
+        }
         #endregion
 
         #region  ImportShareUrl 
@@ -270,10 +290,9 @@ namespace v2rayN.Handler
                             msg = UIRes.I18N("FailedConversionConfiguration");
                             return null;
                         }
-                        vmessItem.security = Global.DefaultSecurity;
+
                         vmessItem.network = Global.DefaultNetwork;
                         vmessItem.headerType = Global.None;
-
 
                         vmessItem.configVersion = Utils.ToInt(vmessQRCode.v);
                         vmessItem.remarks = Utils.ToString(vmessQRCode.ps);
@@ -281,7 +300,16 @@ namespace v2rayN.Handler
                         vmessItem.port = Utils.ToInt(vmessQRCode.port);
                         vmessItem.id = Utils.ToString(vmessQRCode.id);
                         vmessItem.alterId = Utils.ToInt(vmessQRCode.aid);
+                        vmessItem.security = Utils.ToString(vmessQRCode.scy);
 
+                        if (!Utils.IsNullOrEmpty(vmessQRCode.scy))
+                        {
+                            vmessItem.security = vmessQRCode.scy;
+                        }
+                        else
+                        {
+                            vmessItem.security = Global.DefaultSecurity;
+                        }
                         if (!Utils.IsNullOrEmpty(vmessQRCode.net))
                         {
                             vmessItem.network = vmessQRCode.net;
@@ -294,6 +322,7 @@ namespace v2rayN.Handler
                         vmessItem.requestHost = Utils.ToString(vmessQRCode.host);
                         vmessItem.path = Utils.ToString(vmessQRCode.path);
                         vmessItem.streamSecurity = Utils.ToString(vmessQRCode.tls);
+                        vmessItem.sni = Utils.ToString(vmessQRCode.sni);
                     }
 
                     ConfigHandler.UpgradeServerVersion(ref vmessItem);
@@ -374,7 +403,7 @@ namespace v2rayN.Handler
                     vmessItem.id = uri.UserInfo;
 
                     var qurery = HttpUtility.ParseQueryString(uri.Query);
-                    vmessItem.requestHost = qurery["sni"] ?? "";
+                    vmessItem.sni = qurery["sni"] ?? "";
 
                     var remarks = uri.Fragment.Replace("#", "");
                     if (Utils.IsNullOrEmpty(remarks))
@@ -640,6 +669,7 @@ namespace v2rayN.Handler
             item.flow = query["flow"] ?? "";
             item.security = query["encryption"] ?? "none";
             item.streamSecurity = query["security"] ?? "";
+            item.sni = query["sni"] ?? "";
             item.network = query["type"] ?? "tcp";
             switch (item.network)
             {
@@ -670,7 +700,10 @@ namespace v2rayN.Handler
                     item.requestHost = query["quicSecurity"] ?? "none";
                     item.path = Utils.UrlDecode(query["key"] ?? "");
                     break;
-
+                case "grpc":
+                    item.path = Utils.UrlDecode(query["serviceName"] ?? "");
+                    item.headerType= Utils.UrlDecode(query["mode"] ?? Global.GrpcgunMode);
+                    break;
                 default:
                     return null;
             }

@@ -6,7 +6,7 @@ using v2rayN.Mode;
 namespace v2rayN.Forms
 {
     public partial class AddServerForm : BaseServerForm
-    { 
+    {
 
         public AddServerForm()
         {
@@ -45,6 +45,7 @@ namespace v2rayN.Forms
             txtPath.Text = vmessItem.path;
             cmbStreamSecurity.Text = vmessItem.streamSecurity;
             cmbAllowInsecure.Text = vmessItem.allowInsecure;
+            txtSNI.Text = vmessItem.sni;
         }
 
 
@@ -66,6 +67,7 @@ namespace v2rayN.Forms
             cmbStreamSecurity.Text = "";
             cmbAllowInsecure.Text = "";
             txtPath.Text = "";
+            txtSNI.Text = "";
         }
 
 
@@ -88,23 +90,30 @@ namespace v2rayN.Forms
                 return;
             }
 
-            cmbHeaderType.Items.Add(Global.None);
             if (network.Equals(Global.DefaultNetwork))
             {
+                cmbHeaderType.Items.Add(Global.None);
                 cmbHeaderType.Items.Add(Global.TcpHeaderHttp);
             }
             else if (network.Equals("kcp") || network.Equals("quic"))
             {
+                cmbHeaderType.Items.Add(Global.None);
                 cmbHeaderType.Items.Add("srtp");
                 cmbHeaderType.Items.Add("utp");
                 cmbHeaderType.Items.Add("wechat-video");
                 cmbHeaderType.Items.Add("dtls");
                 cmbHeaderType.Items.Add("wireguard");
             }
+            else if (network.Equals("grpc"))
+            {
+                cmbHeaderType.Items.Add(Global.GrpcgunMode);
+                cmbHeaderType.Items.Add(Global.GrpcmultiMode);
+            }
             else
             {
+                cmbHeaderType.Items.Add(Global.None);
             }
-            cmbHeaderType.Text = Global.None;
+            cmbHeaderType.SelectedIndex = 0;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -122,6 +131,7 @@ namespace v2rayN.Forms
             string path = txtPath.Text;
             string streamSecurity = cmbStreamSecurity.Text;
             string allowInsecure = cmbAllowInsecure.Text;
+            string sni = txtSNI.Text;
 
             if (Utils.IsNullOrEmpty(address))
             {
@@ -157,6 +167,7 @@ namespace v2rayN.Forms
             vmessItem.path = path.Replace(" ", "");
             vmessItem.streamSecurity = streamSecurity;
             vmessItem.allowInsecure = allowInsecure;
+            vmessItem.sni = sni;
 
             if (ConfigHandler.AddServer(ref config, vmessItem, EditIndex) == 0)
             {

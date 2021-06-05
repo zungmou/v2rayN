@@ -238,7 +238,7 @@
     <value>Clear original subscription content</value>
   </data>
   <data name="MsgDownloadV2rayCoreSuccessfully" xml:space="preserve">
-    <value>Download V2ray successfully</value>
+    <value>Download Core successfully</value>
   </data>
   <data name="MsgFailedImportSubscription" xml:space="preserve">
     <value>Failed to import subscription content</value>
@@ -283,10 +283,10 @@
     <value>Update subscription starts</value>
   </data>
   <data name="MsgUpdateV2rayCoreSuccessfully" xml:space="preserve">
-    <value>Update V2rayCore successfully</value>
+    <value>Update Core successfully</value>
   </data>
   <data name="MsgUpdateV2rayCoreSuccessfullyMore" xml:space="preserve">
-    <value>Update V2rayCore successfully! Restarting service...</value>
+    <value>Update Core successfully! Restarting service...</value>
   </data>
   <data name="NeedHttpGlobalProxy" xml:space="preserve">
     <value> This feature relies on the Http global proxy, please set it correctly first.</value>
@@ -298,7 +298,7 @@
     <value> non-Vmess service, this feature is invalid</value>
   </data>
   <data name="NotFoundCore" xml:space="preserve">
-    <value>V2ray-core not found, please download: {0}</value>
+    <value>Core not found, please download: {0}</value>
   </data>
   <data name="NoValidQRcodeFound" xml:space="preserve">
     <value>Scan completed, no valid QR code found</value>
@@ -384,5 +384,14 @@
   </data>
   <data name="MsgNeedUrl" xml:space="preserve">
     <value>Please fill in the address (Url)</value>
+  </data>
+  <data name="AddBatchRoutingRulesYesNo" xml:space="preserve">
+    <value>Do you want to append rules? Choose yes to append, choose otherwise to replace</value>
+  </data>
+  <data name="MsgDownloadGeoFileSuccessfully" xml:space="preserve">
+    <value>Download GeoFile: {0} successfully</value>
+  </data>
+  <data name="MsgInformationTitle" xml:space="preserve">
+    <value>Informations (Filter : {0})</value>
   </data>
 </root>
