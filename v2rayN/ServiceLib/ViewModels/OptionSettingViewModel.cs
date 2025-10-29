@@ -59,6 +59,8 @@ public class OptionSettingViewModel : MyReactiveObject
     [Reactive] public string SpeedTestUrl { get; set; }
     [Reactive] public string SpeedPingTestUrl { get; set; }
     [Reactive] public int MixedConcurrencyCount { get; set; }
+    [Reactive] public bool AutoRealPingTest { get; set; }
+    [Reactive] public int AutoRealPingTestInterval { get; set; }
     [Reactive] public bool EnableHWA { get; set; }
     [Reactive] public string SubConvertUrl { get; set; }
     [Reactive] public int MainGirdOrientation { get; set; }
@@ -176,6 +178,8 @@ public class OptionSettingViewModel : MyReactiveObject
         SpeedTestUrl = _config.SpeedTestItem.SpeedTestUrl;
         MixedConcurrencyCount = _config.SpeedTestItem.MixedConcurrencyCount;
         SpeedPingTestUrl = _config.SpeedTestItem.SpeedPingTestUrl;
+        AutoRealPingTest = _config.SpeedTestItem.AutoRealPingTest;
+        AutoRealPingTestInterval = _config.SpeedTestItem.AutoRealPingTestInterval;
         EnableHWA = _config.GuiItem.EnableHWA;
         SubConvertUrl = _config.ConstItem.SubConvertUrl;
         MainGirdOrientation = (int)_config.UiItem.MainGirdOrientation;
@@ -335,6 +339,8 @@ public class OptionSettingViewModel : MyReactiveObject
         _config.SpeedTestItem.MixedConcurrencyCount = MixedConcurrencyCount;
         _config.SpeedTestItem.SpeedTestUrl = SpeedTestUrl;
         _config.SpeedTestItem.SpeedPingTestUrl = SpeedPingTestUrl;
+        _config.SpeedTestItem.AutoRealPingTest = AutoRealPingTest;
+        _config.SpeedTestItem.AutoRealPingTestInterval = AutoRealPingTestInterval;
         _config.GuiItem.EnableHWA = EnableHWA;
         _config.ConstItem.SubConvertUrl = SubConvertUrl;
         _config.UiItem.MainGirdOrientation = (EGirdOrientation)MainGirdOrientation;

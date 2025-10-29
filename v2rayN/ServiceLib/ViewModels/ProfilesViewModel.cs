@@ -8,6 +8,7 @@ public class ProfilesViewModel : MyReactiveObject
     private string _serverFilter = string.Empty;
     private Dictionary<string, bool> _dicHeaderSort = new();
     private SpeedtestService? _speedtestService;
+    private CancellationTokenSource? _autoRealPingCts;
 
     #endregion private prop
 
@@ -273,6 +274,9 @@ public class ProfilesViewModel : MyReactiveObject
 
         await RefreshSubscriptions();
         //await RefreshServers();
+        
+        // 启动自动TCP真连接延迟测试任务
+        _ = StartAutoRealPingTask();
     }
 
     #endregion Init
@@ -878,4 +882,191 @@ public class ProfilesViewModel : MyReactiveObject
     }
 
     #endregion Subscription
+
+    #region Auto Real Ping Test
+
+    /// <summary>
+    /// 启动自动TCP真连接延迟测试任务
+    /// </summary>
+    private async Task StartAutoRealPingTask()
+    {
+        _autoRealPingCts?.Cancel();
+        _autoRealPingCts = new CancellationTokenSource();
+        
+        _ = Task.Run(async () =>
+        {
+            var numOfExecuted = 1;
+            while (!_autoRealPingCts.Token.IsCancellationRequested)
+            {
+                await Task.Delay(1000 * 60, _autoRealPingCts.Token); // 每分钟检查一次
+                numOfExecuted++;
+                
+                // 检查是否启用自动测试
+                if (!_config.SpeedTestItem.AutoRealPingTest)
+                {
+                    continue;
+                }
+                
+                // 检查测试间隔
+                if (_config.SpeedTestItem.AutoRealPingTestInterval <= 0)
+                {
+                    continue;
+                }
+                
+                // 检查是否到达测试间隔
+                if (numOfExecuted % _config.SpeedTestItem.AutoRealPingTestInterval != 0)
+                {
+                    continue;
+                }
+                
+                // 执行自动TCP真连接延迟测试
+                await AutoRealPingTest();
+            }
+        }, _autoRealPingCts.Token);
+        
+        await Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 执行自动TCP真连接延迟测试并重新排序
+    /// </summary>
+    private async Task AutoRealPingTest()
+    {
+        try
+        {
+            // 检查是否有服务器需要测试
+            if (ProfileItems.Count == 0)
+            {
+                return;
+            }
+            
+            // 发送通知
+            NoticeManager.Instance.SendMessageEx("开始自动TCP真连接延迟测试...");
+            
+            // 执行TCP真连接延迟测试
+            await ServerSpeedtest(ESpeedActionType.Realping);
+            
+            // 等待测试完成
+            await Task.Delay(5000);
+            
+            // 按照延迟最短重新排序
+            await SortServersByDelay();
+            
+            // 检查并切换当前活动服务器（如果不可用）
+            await CheckAndSwitchCurrentServer();
+            
+            NoticeManager.Instance.SendMessageEx("自动TCP真连接延迟测试完成");
+        }
+        catch (Exception ex)
+        {
+            NoticeManager.Instance.SendMessageEx($"自动TCP真连接延迟测试失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 检查当前活动服务器是否可用，如果不可用则切换到可用服务器中延迟最低的一个
+    /// </summary>
+    private async Task CheckAndSwitchCurrentServer()
+    {
+        try
+        {
+            // 获取当前活动服务器
+            var currentServer = await ConfigHandler.GetDefaultServer(_config);
+            if (currentServer == null)
+            {
+                return;
+            }
+            
+            // 在ProfileItems中查找当前服务器的延迟信息
+            var currentProfileItem = ProfileItems.FirstOrDefault(p => p.IndexId == currentServer.IndexId);
+            if (currentProfileItem == null)
+            {
+                return;
+            }
+            
+            // 判断服务器是否可用：延迟大于0且小于超时时间（通常超时时间设为5000ms）
+            bool isCurrentServerAvailable = currentProfileItem.Delay > 0 && currentProfileItem.Delay < 5000;
+            
+            if (!isCurrentServerAvailable)
+            {
+                // 当前服务器不可用，查找可用服务器中延迟最低的一个
+                var availableServers = ProfileItems
+                    .Where(p => p.Delay > 0 && p.Delay < 5000) // 延迟在合理范围内
+                    .OrderBy(p => p.Delay) // 按延迟升序排序
+                    .ToList();
+                
+                if (availableServers.Count > 0)
+                {
+                    var bestServer = availableServers.First();
+                    
+                    // 切换到最佳可用服务器
+                    await SetDefaultServer(bestServer.IndexId);
+                    
+                    NoticeManager.Instance.SendMessageEx($"当前服务器不可用，已自动切换到延迟最低的可用服务器: {bestServer.Remarks} (延迟: {bestServer.Delay}ms)");
+                }
+                else
+                {
+                    NoticeManager.Instance.SendMessageEx("当前服务器不可用，但未找到其他可用服务器");
+                }
+            }
+            // 如果当前服务器可用，则不进行切换
+        }
+        catch (Exception ex)
+        {
+            NoticeManager.Instance.SendMessageEx($"检查并切换服务器失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 按照延迟最短重新排序服务器
+    /// </summary>
+    private async Task SortServersByDelay()
+    {
+        try
+        {
+            // 将所有服务器分为三类进行排序：
+            // 1. 可用服务器（Delay > 0）：按延迟从小到大排序
+            // 2. 未测试服务器（Delay = 0）：排在可用服务器之后
+            // 3. 连接失败的服务器（Delay = -1）：排在最后
+            var sortedServers = ProfileItems
+                .OrderBy(p => 
+                {
+                    // 第一优先级：服务器状态
+                    if (p.Delay > 0) return 1;  // 可用服务器排第一
+                    if (p.Delay == 0) return 2; // 未测试服务器排第二
+                    return 3;                   // 连接失败的服务器排最后
+                })
+                .ThenBy(p => p.Delay) // 第二优先级：延迟值（仅对可用服务器有效）
+                .ToList();
+            
+            // 更新所有服务器的排序
+            for (int i = 0; i < sortedServers.Count; i++)
+            {
+                var server = sortedServers[i];
+                ProfileExManager.Instance.SetSort(server.IndexId, i + 1);
+            }
+            
+            // 保存排序结果
+            await ProfileExManager.Instance.SaveTo();
+            
+            // 刷新服务器列表显示
+            await RefreshServers();
+        }
+        catch (Exception ex)
+        {
+            NoticeManager.Instance.SendMessageEx($"服务器排序失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 停止自动TCP真连接延迟测试
+    /// </summary>
+    public void StopAutoRealPingTask()
+    {
+        _autoRealPingCts?.Cancel();
+        _autoRealPingCts = null;
+    }
+
+    #endregion Auto Real Ping Test
+
 }

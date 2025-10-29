@@ -132,6 +132,10 @@ public static class ConfigHandler
         {
             config.SpeedTestItem.MixedConcurrencyCount = 5;
         }
+        if (config.SpeedTestItem.AutoRealPingTestInterval < 1)
+        {
+            config.SpeedTestItem.AutoRealPingTestInterval = 10;
+        }
 
         config.Mux4RayItem ??= new()
         {

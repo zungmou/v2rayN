@@ -157,6 +157,8 @@ public class SpeedTestItem
     public string SpeedPingTestUrl { get; set; }
     public int MixedConcurrencyCount { get; set; }
     public string IPAPIUrl { get; set; }
+    public bool AutoRealPingTest { get; set; }
+    public int AutoRealPingTestInterval { get; set; } = 10;
 }
 
 [Serializable]
